@@ -127,26 +127,19 @@ public class SearchServlet extends HttpServlet {
         	log += "Hypothesis: " +  result.getHypothesis() + "\n List of recognized words and their times: \n";
             System.out.format("Hypothesis: %s\n", result.getHypothesis());
 
-//            System.out.println("List of recognized words and their times:");
             for (WordResult r : result.getWords()) {
             	log += r + "\n";
-//                System.out.println(r);
             }
             
-            Node iniNode = result.getLattice().getInitialNode();
-//            ListAllChildNode(iniNode, 0);
-//            LogAllPath(iniNode,0,result.getLattice()) ;     
+            Node iniNode = result.getLattice().getInitialNode();   
             MyPath path = ConvertToMyPath(iniNode, result.getLattice());
             PruneMyPath(path);
             MergeMyPath(path,false);
             responseStr = result.getHypothesis() + "~" + ConvertToJSON(path) ;
             
             log += "\nBest 20 hypothesis:\n";
-//            System.out.println("\nBest 20 hypothesis:");
             for (String s : result.getNbest(20)){
             	log += s + "\n";
-//                System.out.println(s);
-//                nBestRsults += " " + s;
             }
             ++count;
 
@@ -157,16 +150,8 @@ public class SearchServlet extends HttpServlet {
         stream.close();
 		
 	    response.setContentType("text/plain");  // Set content type of the response so that jQuery knows what it can expect.
-	    response.setCharacterEncoding("UTF-8"); // You want world domination, huh?
-	    response.getWriter().write(responseStr);       // Write response body.
-		
-/*        request.setAttribute("query", query); // This will be available as ${message}
-        getServletContext().getRequestDispatcher("/Search.jsp").forward(request, response);*/
-        
-//        request.getSession().setAttribute("query", query); // This will be available as ${message}
-//        response.sendRedirect("/qut701/Search.jsp");
-
-//		out.println(query);
+	    response.setCharacterEncoding("UTF-8"); 
+	    response.getWriter().write(responseStr);       
 	}
 	
      String CurrentTab(int tabLevel)
@@ -229,7 +214,6 @@ public class SearchServlet extends HttpServlet {
     void LogAllPath(Node n, int tabLevel, Lattice l)
     {
     	double nodeConfidence = logMath.logToLinear((float)n.getPosterior());
-/*    	String result = "";*/
     	
     	if (nodeConfidence > 0){
     		log += GetNodeInfo(n);
@@ -239,39 +223,20 @@ public class SearchServlet extends HttpServlet {
     	if (childs.size() > 0)
     	{
     		MergeSimilarNodes(childs, l);    		
-/*			if(IsArrayChild(childs))
-				result += "[";*/
 			++tabLevel;
-/*			int count = 0;*/
         	for(Node child : childs)
         	{
     	    	double childConfidence = logMath.logToLinear((float)child.getPosterior());
     	    	if (childConfidence > 0){
-/*        			if ((count != 0))
-        				result += ",";	*/
-/*    	    		result += "{\"Word\": \"" + (!child.getWord().isFiller() ? child.getWord().getSpelling() : "FillerNode") + "\"," 
-    	    				+ "\"Confidience\": \"" + String.format("%.5f", childConfidence) + "\"" ;*/
     	    		log += "\n" + CurrentTab(tabLevel);
-//	        		System.out.println();
-//	        		System.out.print(CurrentTab(tabLevel));
-/*    	    		if(!AllPoorChilds(child.getChildNodes()))
-        				result += ",\"Node\": ";*/
     	    	}
         		LogAllPath(child,tabLevel,l);
-/*        		if (childConfidence > 0){
-        			result += "}";
-        			++count;
-        		}       		    			
-        	}*/
-/*			if(IsArrayChild(childs))
-				result += "]";*/
         	}
     	}
     }
     
     MyPath ConvertToMyPath(Node n,Lattice l)
     {
-//    	double nodeConfidence = logMath.logToLinear((float)n.getPosterior());
     	String word = !n.getWord().isFiller() ? n.getWord().getSpelling() : "";
     	MyPath path = new MyPath(word);
     	List<Node> childs = n.getChildNodes(); 
